@@ -11,7 +11,7 @@ public class CriarUsuarioService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public void executar(String nome, String email, String senha) {
+    public boolean criar(String nome, String email, String senha) {
         usuarioRepository.buscarPorEmail(email).ifPresent(u -> {
             throw new RuntimeException("Usuário já cadastrado com este e-mail.");
         });
@@ -19,5 +19,6 @@ public class CriarUsuarioService {
         Usuario novoUsuario = new Usuario(nome,email,senha);
 
         usuarioRepository.salvar(novoUsuario);
+        return true;
     }
 }

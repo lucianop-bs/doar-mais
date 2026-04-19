@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ItemRepository {
-    private final List<Item> listaItems = new ArrayList<>();
+    private static final List<Item> listaItems = new ArrayList<>();
 
     public void adicionarItem(Item item) {
         listaItems.add(item);

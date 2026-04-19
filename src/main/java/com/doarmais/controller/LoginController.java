@@ -34,8 +34,7 @@ public class LoginController {
         try {
             boolean sucesso = loginService.autenticar(usuario, senha);
             if (sucesso) {
-               abrirTelaCadastro("cadastro.fxml");
-
+                System.out.println(usuario);
             }
         } catch (Exception e) {
             lblError.setText(e.getMessage());
@@ -44,7 +43,12 @@ public class LoginController {
 
     }
 
-    private void abrirTelaCadastro(String fxml){
+    @FXML
+    void onCadastrarClick(ActionEvent event) {
+        abrirNovaTela("cadastro.fxml");
+    }
+
+    private void abrirNovaTela(String fxml){
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/" + fxml));
             Parent root = fxmlLoader.load();

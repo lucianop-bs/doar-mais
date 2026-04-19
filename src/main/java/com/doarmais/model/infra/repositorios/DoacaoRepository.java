@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DoacaoRepository {
-    private final List<Doacao> listaDoacao = new ArrayList<>();
+    private static final List<Doacao> listaDoacao = new ArrayList<>();
 
     public List<Doacao> getListaDoacao() {
         return listaDoacao;

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class UsuarioRepository {
-    private List<Usuario> usuarios = new ArrayList<>();
+    private static final List<Usuario> usuarios = new ArrayList<>();
     {
         usuarios.add(new Usuario("admin","admin","admin"));
     }

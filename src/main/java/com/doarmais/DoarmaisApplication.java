@@ -15,7 +15,7 @@ public class DoarmaisApplication extends Application {
     public void start(Stage primaryStage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/login.fxml"));
 
-        Scene scene = new Scene(fxmlLoader.load(), 400, 600);
+        Scene scene = new Scene(fxmlLoader.load());
 
         primaryStage.setTitle("Login");
         primaryStage.setScene(scene);
