@@ -1,4 +1,4 @@
-package com.doarmais.Domain;
+package com.doarmais.model.domain;
 
 import java.time.LocalDateTime;
 
@@ -31,6 +31,14 @@ public class Usuario {
         this.email = email;
     }
 
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha() {
+        this.senha = senha;
+    }
+
     public LocalDateTime getCriadoEm() {
         return criadoEm;
     }
@@ -38,5 +46,4 @@ public class Usuario {
     public void setCriadoEm(LocalDateTime criadoEm) {
         this.criadoEm = criadoEm;
     }
-
 }

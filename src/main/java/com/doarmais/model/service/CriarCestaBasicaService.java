@@ -1,7 +1,7 @@
-package com.doarmais.Services;
+package com.doarmais.model.service;
 
 
-import com.doarmais.Infra.Repositorios.DoacaoRepository;
+import com.doarmais.model.infra.repositorios.DoacaoRepository;
 
 public class CriarCestaBasicaService {
     private DoacaoRepository doacaoRepository;

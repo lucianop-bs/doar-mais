@@ -1,4 +1,4 @@
-package com.doarmais.Domain;
+package com.doarmais.model.domain;
 
 import java.time.LocalDateTime;
 

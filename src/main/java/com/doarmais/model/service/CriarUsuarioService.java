@@ -1,8 +1,8 @@
-package com.doarmais.Services;
+package com.doarmais.model.service;
 
 
-import com.doarmais.Domain.Usuario;
-import com.doarmais.Infra.Repositorios.UsuarioRepository;
+import com.doarmais.model.domain.Usuario;
+import com.doarmais.model.infra.repositorios.UsuarioRepository;
 
 public class CriarUsuarioService {
     private final UsuarioRepository usuarioRepository;
@@ -12,9 +12,9 @@ public class CriarUsuarioService {
     }
 
     public void executar(String nome, String email, String senha) {
-        if (usuarioRepository.buscarPorEmail(email) != null) {
+        usuarioRepository.buscarPorEmail(email).ifPresent(u -> {
             throw new RuntimeException("Usuário já cadastrado com este e-mail.");
-        }
+        });
 
         Usuario novoUsuario = new Usuario(nome,email,senha);
 

@@ -1,10 +1,11 @@
-package com.doarmais.Services;
-import com.doarmais.Domain.Doacao;
-import com.doarmais.Domain.Item;
-import com.doarmais.Domain.Usuario;
-import com.doarmais.Infra.Repositorios.DoacaoRepository;
-import com.doarmais.Infra.Repositorios.ItemRepository;
-import com.doarmais.Infra.Repositorios.UsuarioRepository;
+package com.doarmais.model.service;
+
+import com.doarmais.model.domain.Doacao;
+import com.doarmais.model.domain.Item;
+import com.doarmais.model.domain.Usuario;
+import com.doarmais.model.infra.repositorios.DoacaoRepository;
+import com.doarmais.model.infra.repositorios.ItemRepository;
+import com.doarmais.model.infra.repositorios.UsuarioRepository;
 
 import java.util.List;
 

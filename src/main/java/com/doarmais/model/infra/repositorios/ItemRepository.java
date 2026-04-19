@@ -1,5 +1,6 @@
-package com.doarmais.Infra.Repositorios;
-import com.doarmais.Domain.Item;
+package com.doarmais.model.infra.repositorios;
+
+import com.doarmais.model.domain.Item;
 
 import java.util.ArrayList;
 import java.util.List;

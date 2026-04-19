@@ -1,4 +1,4 @@
-package com.doarmais.Domain;
+package com.doarmais.model.domain;
 
 public class Item {
     private ItemDoacao nome;
