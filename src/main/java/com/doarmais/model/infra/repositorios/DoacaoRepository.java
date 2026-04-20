@@ -1,14 +1,13 @@
 package com.doarmais.model.infra.repositorios;
 
 import com.doarmais.model.domain.Doacao;
-
-import java.util.ArrayList;
-import java.util.List;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class DoacaoRepository {
-    private static final List<Doacao> listaDoacao = new ArrayList<>();
+    private static final ObservableList<Doacao> listaDoacao = FXCollections.observableArrayList();
 
-    public List<Doacao> getListaDoacao() {
+    public ObservableList<Doacao> getListaDoacao() {
         return listaDoacao;
     }
 

@@ -1,7 +1,9 @@
 package com.doarmais.controller;
 
+import com.doarmais.model.domain.Usuario;
 import com.doarmais.model.infra.repositorios.UsuarioRepository;
 import com.doarmais.model.service.LoginService;
+import com.doarmais.model.utils.UsuarioLogado;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -32,9 +34,10 @@ public class LoginController {
         String senha = txtSenha.getText();
 
         try {
-            boolean sucesso = loginService.autenticar(usuario, senha);
-            if (sucesso) {
-                System.out.println(usuario);
+            Usuario user = loginService.autenticar(usuario, senha);
+            if (user != null) {
+                abrirNovaTela("dashboard.fxml", "Dashboard");
+                UsuarioLogado.setUsuarioLogado(user);
             }
         } catch (Exception e) {
             lblError.setText(e.getMessage());
@@ -45,17 +48,17 @@ public class LoginController {
 
     @FXML
     void onCadastrarClick(ActionEvent event) {
-        abrirNovaTela("cadastro.fxml");
+        abrirNovaTela("cadastro.fxml", "Cadastro");
     }
 
-    private void abrirNovaTela(String fxml){
+    private void abrirNovaTela(String fxml, String nome) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/" + fxml));
             Parent root = fxmlLoader.load();
             Stage stage = (Stage) txtUsuario.getScene().getWindow();
 
             stage.setScene(new Scene(root));
-            stage.setTitle("Cadastro de Usuario");
+            stage.setTitle(nome);
             stage.show();
 
         } catch (IOException e) {

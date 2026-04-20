@@ -37,7 +37,7 @@ public class CadastroController {
         try{
             boolean sucesso = criarUsuarioService.criar(nome, email, senha);
                 if(sucesso){
-                    abrirNovaTela("login.fxml");
+                    abrirNovaTela("login.fxml", "Login");
                 }
         } catch (Exception e) {
             lblError.setText(e.getMessage());
@@ -46,18 +46,19 @@ public class CadastroController {
 
     }
 
+    @FXML
     public void voltar(){
-        abrirNovaTela("login.fxml");
+        abrirNovaTela("login.fxml", "Login");
     }
 
-    private void abrirNovaTela(String fxml){
+    private void abrirNovaTela(String fxml, String nome) {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/" + fxml));
             Parent root = fxmlLoader.load();
             Stage stage = (Stage) txtNome.getScene().getWindow();
 
             stage.setScene(new Scene(root));
-            stage.setTitle("Login");
+            stage.setTitle(nome);
             stage.show();
 
         } catch (IOException e) {

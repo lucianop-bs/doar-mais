@@ -10,10 +10,9 @@ public class LoginService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public boolean autenticar(String email, String senha) {
-        Usuario usuario = usuarioRepository.login(email, senha)
+    public Usuario autenticar(String email, String senha) {
+        return usuarioRepository.login(email, senha)
                 .orElseThrow(() -> new RuntimeException("Usuário ou senha inválidos."));
-        return true;
     }
 
 }
