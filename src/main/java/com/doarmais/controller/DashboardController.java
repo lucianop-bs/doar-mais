@@ -4,13 +4,14 @@ import com.doarmais.model.domain.Doacao;
 import com.doarmais.model.domain.Item;
 import com.doarmais.model.domain.ItemDoacao;
 import com.doarmais.model.domain.Usuario;
+import com.doarmais.model.infra.contexto.DbContext;
 import com.doarmais.model.infra.repositorios.DoacaoRepository;
-import com.doarmais.model.infra.repositorios.ItemRepository;
 import com.doarmais.model.service.CriarCestaBasicaService;
 import com.doarmais.model.service.CriarDoacaoService;
 import com.doarmais.model.utils.UsuarioLogado;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,14 +25,23 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class DashboardController implements Initializable {
-    private final ItemRepository itemRepository = new ItemRepository();
-    private final DoacaoRepository doacaoRepository = new DoacaoRepository();
-    private final CriarDoacaoService criarDoacaoService = new CriarDoacaoService(itemRepository, doacaoRepository);
-    private final CriarCestaBasicaService criarCestaBasicaService = new CriarCestaBasicaService(itemRepository);
+
+    private final ObservableList<Doacao> listaObservavel = FXCollections.observableArrayList();
+
+    private final ObservableList<Item> listaObservavelItens = FXCollections.observableArrayList();
+
+    private final DbContext conexao = new DbContext();
+    private final Connection connection = conexao.conectar();
+    private final DoacaoRepository doacaoRepository = new DoacaoRepository(connection);
+    private final CriarDoacaoService criarDoacaoService = new CriarDoacaoService( doacaoRepository);
+    private final CriarCestaBasicaService criarCestaBasicaService = new CriarCestaBasicaService(doacaoRepository);
 
     @FXML
     private ComboBox<ItemDoacao> cbItemDoacao;
@@ -51,7 +61,6 @@ public class DashboardController implements Initializable {
     private TableColumn<Doacao, String> colUsuario;
     @FXML
     private TableColumn<Doacao, String> colData;
-
     @FXML
     private TableView<Item> tableItem;
     @FXML
@@ -62,14 +71,15 @@ public class DashboardController implements Initializable {
     @FXML
     private Label lblError;
 
-
+   
+    
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
         colItem.setCellValueFactory(celula -> new ReadOnlyStringWrapper(celula.getValue().getItemDoacao().getNome().getDescricao()));
         colUsuario.setCellValueFactory(celula -> new ReadOnlyStringWrapper(celula.getValue().getUsuario().getNome()));
         colQtd.setCellValueFactory(celula -> new ReadOnlyStringWrapper(celula.getValue().getItemDoacao().getQtd().toString()));
-        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         colData.setCellValueFactory(celula -> new ReadOnlyStringWrapper(celula.getValue().getCriadoEm().format(formatador)));
 
         colItemNome.setCellValueFactory(celula -> new ReadOnlyStringWrapper(celula.getValue().getNome().getDescricao()));
@@ -80,9 +90,11 @@ public class DashboardController implements Initializable {
 
         cbItemDoacao.setItems(FXCollections.observableArrayList(ItemDoacao.values()));
         cbItemDoacao.getSelectionModel().selectFirst();
+
+        tableItem.setItems(listaObservavelItens);
+        tableDoacoes.setItems(listaObservavel);
+
         atualizar();
-        tableItem.setItems(itemRepository.getListaTotal());
-        tableDoacoes.setItems(doacaoRepository.getListaDoacao());
     }
 
     @FXML
@@ -97,8 +109,14 @@ public class DashboardController implements Initializable {
 
     @FXML
     void atualizar() {
-        criarCestaBasicaService.criarListaTotalDeCestas();
+        List<Doacao> doacoesDoBanco = doacaoRepository.buscarTodos();
+        listaObservavel.setAll(doacoesDoBanco);
+        List<Item> totais = criarCestaBasicaService.obterListaDeEstoque();
+
+        listaObservavelItens.setAll(totais);
+
         int totalDeCestas = criarCestaBasicaService.criarCesta();
+
         lblTotal.setText(String.valueOf(totalDeCestas));
         lblTotal.setVisible(true);
     }

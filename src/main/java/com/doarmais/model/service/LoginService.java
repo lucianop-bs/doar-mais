@@ -11,8 +11,13 @@ public class LoginService {
     }
 
     public Usuario autenticar(String email, String senha) {
-        return usuarioRepository.login(email, senha)
-                .orElseThrow(() -> new RuntimeException("Usuário ou senha inválidos."));
+        Usuario user = usuarioRepository.login(email, senha);
+
+        if (user == null) {
+            throw new RuntimeException("Usuário ou senha incorretos");
+        }
+        return usuarioRepository.login(email, senha);
+
     }
 
 }

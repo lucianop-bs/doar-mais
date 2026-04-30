@@ -2,42 +2,43 @@ package com.doarmais.model.service;
 
 import com.doarmais.model.domain.Item;
 import com.doarmais.model.domain.ItemDoacao;
-import com.doarmais.model.infra.repositorios.ItemRepository;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
+import com.doarmais.model.infra.repositorios.DoacaoRepository;
 
+
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class CriarCestaBasicaService {
+    private final DoacaoRepository doacaoRepository;
 
-    private static final ObservableList<Item> listaTotal = FXCollections.observableArrayList();
-    private final ItemRepository itemRepository;
-
-    public CriarCestaBasicaService(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
+    public CriarCestaBasicaService(DoacaoRepository doacaoRepository) {
+        this.doacaoRepository = doacaoRepository;
     }
 
-    public Map<ItemDoacao, Integer> criarMapTotalDeCestas() {
-        return itemRepository.getListaItems().stream()
+
+    public Map<ItemDoacao, Integer> calcularEstoqueAgrupado() {
+
+        var lista = doacaoRepository.buscarTodos();
+        return lista.stream()
                 .collect(Collectors.groupingBy(
-                        Item::getNome,
-                        Collectors.summingInt(Item::getQtd)
+                        doacao -> doacao.getItemDoacao().getNome(),
+                        Collectors.summingInt(doacao -> doacao.getItemDoacao().getQtd())
                 ));
 
     }
 
-    public void criarListaTotalDeCestas() {
-        var totaisNoEstoque = criarMapTotalDeCestas();
-        var resultado = totaisNoEstoque.entrySet().stream()
+    public List<Item> obterListaDeEstoque() {
+        var totaisNoEstoque = calcularEstoqueAgrupado();
+
+        return totaisNoEstoque.entrySet().stream()
                 .map(entrada -> new Item(entrada.getKey(), entrada.getValue()))
                 .toList();
-        itemRepository.adicionarTotal(resultado);
     }
 
     public int criarCesta() {
 
-        var totais = criarMapTotalDeCestas();
+        var totais = calcularEstoqueAgrupado();
 
         int totalDeCestas = 0;
         boolean consegueMontarMaisUma = true;

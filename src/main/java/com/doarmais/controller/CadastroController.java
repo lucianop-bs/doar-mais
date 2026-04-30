@@ -30,14 +30,25 @@ public class CadastroController {
     @FXML
     void onCadastrarClick(ActionEvent event) {
 
+        lblError.setVisible(false);
+        lblError.setText("");
+
         String nome = txtNome.getText();
         String email = txtEmail.getText();
         String senha = txtSenha.getText();
-
+        if(!email.matches("^[a-zA-Z0-9._%+\\-]+@[a-zA-Z0-9.\\-]+\\.[a-zA-Z]{2,}$"))
+        {
+            lblError.setText("Email inválido");
+            lblError.setVisible(true);
+            return;
+        }
         try{
             boolean sucesso = criarUsuarioService.criar(nome, email, senha);
                 if(sucesso){
                     abrirNovaTela("login.fxml", "Login");
+                }
+                else {
+                    lblError.setText("Não foi possivel criar usuario");
                 }
         } catch (Exception e) {
             lblError.setText(e.getMessage());

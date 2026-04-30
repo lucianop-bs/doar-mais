@@ -1,18 +1,29 @@
 package com.doarmais.model.domain;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class Usuario {
+    private Long Id;
     private String nome;
     private String email;
     private String senha;
-    private LocalDateTime criadoEm;
+    private LocalDate criadoEm;
 
+    public Usuario() {
+    }
     public Usuario(String nome, String email, String senha) {
         this.nome = nome;
         this.email = email;
         this.senha = senha;
-        this.criadoEm = LocalDateTime.now();
+        this.criadoEm = LocalDate.now();
+    }
+
+    public Long getId() {
+        return Id;
+    }
+
+    public void setId(Long id) {
+        Id = id;
     }
 
     public String getNome() {
@@ -39,11 +50,11 @@ public class Usuario {
         this.senha = senha;
     }
 
-    public LocalDateTime getCriadoEm() {
+    public LocalDate getCriadoEm() {
         return criadoEm;
     }
 
-    public void setCriadoEm(LocalDateTime criadoEm) {
+    public void setCriadoEm(LocalDate criadoEm) {
         this.criadoEm = criadoEm;
     }
 }
