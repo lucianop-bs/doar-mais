@@ -69,6 +69,8 @@
                         <Label text="Quantidade:" />
                         <Spinner fx:id="spnQtd" />
                         <Button alignment="CENTER" mnemonicParsing="false" onAction="#onClickDoacao" text="Doar" />
+                        <Button fx:id="btnGerenciarUsuarios" alignment="CENTER" mnemonicParsing="false" onAction="#irParaUsuarios" text="Gerenciar Usuários" />
+                      <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" nodeOrientation="LEFT_TO_RIGHT" onAction="#voltar" prefHeight="43.0" prefWidth="190.0" text="SAIR" textFill="#1e0101" />
                     </children>
                     <padding>
                         <Insets left="20.0" />
@@ -81,31 +83,34 @@
         </VBox>
     </left>
     <center>
-        <TableView fx:id="tableDoacoes" prefHeight="398.0" prefWidth="382.0" BorderPane.alignment="CENTER">
+        <TableView fx:id="tableDoacoes" prefHeight="399.0" prefWidth="347.0" BorderPane.alignment="CENTER">
             <columns>
-                <TableColumn fx:id="colItem" prefWidth="103.20001220703125" text="Item Recebido" />
-                <TableColumn fx:id="colQtd" prefWidth="80.800048828125" text="Quantidade" />
-                <TableColumn fx:id="colUsuario" prefWidth="87.20004272460938" text="Doador" />
-                <TableColumn fx:id="colData" prefWidth="94.39996337890625" text="Data" />
+                <TableColumn fx:id="colItem" prefWidth="85.3333740234375" text="Item Recebido" />
+                <TableColumn fx:id="colQtd" prefWidth="92.6666259765625" text="Quantidade" />
+                <TableColumn fx:id="colUsuario" prefWidth="88.0" text="Doador" />
+                <TableColumn fx:id="colData" prefWidth="74.666748046875" text="Data" />
             </columns>
         </TableView>
     </center>
     <bottom>
         <HBox alignment="CENTER" BorderPane.alignment="CENTER">
-            <children>
-                <Button mnemonicParsing="false" onAction="#voltar" prefHeight="43.0" prefWidth="190.0" text="SAIR" textFill="#1e0101">
-               <HBox.margin>
-                  <Insets bottom="20.0" top="20.0" />
-               </HBox.margin></Button>
-            </children>
+         <children>
+            <Button alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onRemover" text="Remover " />
+         </children>
         </HBox>
     </bottom>
     <right>
-        <TableView fx:id="tableItem" prefHeight="398.0" prefWidth="162.0" style="-fx-border-color: black;" BorderPane.alignment="CENTER">
+        <TableView fx:id="tableItem" prefHeight="399.0" prefWidth="228.0" style="-fx-border-color: black;" BorderPane.alignment="CENTER">
             <columns>
                 <TableColumn fx:id="colItemNome" prefWidth="78.39990234375" text="Item" />
                 <TableColumn fx:id="colQtdTotal" prefWidth="55.2000732421875" text="Total" />
             </columns>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <BorderPane.margin>
+            <Insets right="20.0" />
+         </BorderPane.margin>
         </TableView>
     </right>
 </BorderPane>

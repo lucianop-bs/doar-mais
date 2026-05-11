@@ -1,14 +1,16 @@
 package com.doarmais.controller;
 
-import com.doarmais.model.domain.Doacao;
-import com.doarmais.model.domain.Item;
-import com.doarmais.model.domain.ItemDoacao;
-import com.doarmais.model.domain.Usuario;
+import com.doarmais.model.entities.DoacaoEntity;
+import com.doarmais.model.entities.ItemEntity;
+import com.doarmais.model.entities.ItemDoacaoEntity;
+import com.doarmais.model.entities.UsuarioEntity;
 import com.doarmais.model.infra.contexto.DbContext;
-import com.doarmais.model.infra.repositorios.DoacaoRepository;
-import com.doarmais.model.service.CriarCestaBasicaService;
-import com.doarmais.model.service.CriarDoacaoService;
+import com.doarmais.model.dao.DoacaoDAO;
+import com.doarmais.model.bo.CriarCestaBasicaBO;
+import com.doarmais.model.bo.CriarDoacaoBO;
 import com.doarmais.model.utils.UsuarioLogado;
+import com.doarmais.util.AuditLogger;
+import com.doarmais.util.Logger;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -29,53 +31,58 @@ import java.sql.Connection;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class DashboardController implements Initializable {
 
-    private final ObservableList<Doacao> listaObservavel = FXCollections.observableArrayList();
+    private final ObservableList<DoacaoEntity> listaObservavel = FXCollections.observableArrayList();
 
-    private final ObservableList<Item> listaObservavelItens = FXCollections.observableArrayList();
+    private final ObservableList<ItemEntity> listaObservavelItens = FXCollections.observableArrayList();
 
     private final DbContext conexao = new DbContext();
     private final Connection connection = conexao.conectar();
-    private final DoacaoRepository doacaoRepository = new DoacaoRepository(connection);
-    private final CriarDoacaoService criarDoacaoService = new CriarDoacaoService( doacaoRepository);
-    private final CriarCestaBasicaService criarCestaBasicaService = new CriarCestaBasicaService(doacaoRepository);
+    private final DoacaoDAO doacaoDAO = new DoacaoDAO(connection);
+    private final CriarDoacaoBO criarDoacaoBO = new CriarDoacaoBO( doacaoDAO);
+    private final CriarCestaBasicaBO criarCestaBasicaBO = new CriarCestaBasicaBO(doacaoDAO);
 
     @FXML
-    private ComboBox<ItemDoacao> cbItemDoacao;
+    private ComboBox<ItemDoacaoEntity> cbItemDoacao;
     @FXML
-    private Spinner<Integer> spnQtd;
+    private Spinner<Integer> spnQtd = new Spinner<>(1,10000,1);
 
     @FXML
     private Label lblTotal;
 
     @FXML
-    private TableView<Doacao> tableDoacoes;
+    private Button btnGerenciarUsuarios;
+
     @FXML
-    private TableColumn<Doacao, String> colItem;
+    private TableView<DoacaoEntity> tableDoacoes;
     @FXML
-    private TableColumn<Doacao, String> colQtd;
+    private TableColumn<DoacaoEntity, String> colItem;
     @FXML
-    private TableColumn<Doacao, String> colUsuario;
+    private TableColumn<DoacaoEntity, String> colQtd;
     @FXML
-    private TableColumn<Doacao, String> colData;
+    private TableColumn<DoacaoEntity, String> colUsuario;
     @FXML
-    private TableView<Item> tableItem;
+    private TableColumn<DoacaoEntity, String> colData;
     @FXML
-    private TableColumn<Item, String> colItemNome;
+    private TableView<ItemEntity> tableItem;
     @FXML
-    private TableColumn<Item, Integer> colQtdTotal;
+    private TableColumn<ItemEntity, String> colItemNome;
+    @FXML
+    private TableColumn<ItemEntity, Integer> colQtdTotal;
 
     @FXML
     private Label lblError;
 
-   
-    
+    private DoacaoEntity doacaoSelecionada;
+
+
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
         colItem.setCellValueFactory(celula -> new ReadOnlyStringWrapper(celula.getValue().getItemDoacao().getNome().getDescricao()));
         colUsuario.setCellValueFactory(celula -> new ReadOnlyStringWrapper(celula.getValue().getUsuario().getNome()));
         colQtd.setCellValueFactory(celula -> new ReadOnlyStringWrapper(celula.getValue().getItemDoacao().getQtd().toString()));
@@ -88,41 +95,86 @@ public class DashboardController implements Initializable {
         SpinnerValueFactory<Integer> valores = new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 100, 1);
         spnQtd.setValueFactory(valores);
 
-        cbItemDoacao.setItems(FXCollections.observableArrayList(ItemDoacao.values()));
+        cbItemDoacao.setItems(FXCollections.observableArrayList(ItemDoacaoEntity.values()));
         cbItemDoacao.getSelectionModel().selectFirst();
 
         tableItem.setItems(listaObservavelItens);
         tableDoacoes.setItems(listaObservavel);
+
+        tableDoacoes.getSelectionModel().selectedItemProperty().addListener((observable, antigaDoacao, novaDoacao) -> {
+            doacaoSelecionada = novaDoacao;
+        });
+
+        UsuarioEntity user = UsuarioLogado.getUsuarioLogado();
+        if (user != null) {
+            btnGerenciarUsuarios.setVisible(user.isAdmin());
+        }
 
         atualizar();
     }
 
     @FXML
     void onClickDoacao(ActionEvent event) {
-        ItemDoacao item = cbItemDoacao.getValue();
-        Integer qtd = spnQtd.getValue();
-        Item itemDoacao = new Item(item, qtd);
-        Usuario user = UsuarioLogado.getUsuarioLogado();
-        criarDoacaoService.doar(itemDoacao, user);
-        atualizar();
+        UsuarioEntity user = UsuarioLogado.getUsuarioLogado();
+        String username = (user != null) ? user.getNome() : "desconhecido";
+        AuditLogger.logAction("onClickDoacao", username);
+        try {
+            ItemDoacaoEntity item = cbItemDoacao.getValue();
+            Integer qtd = spnQtd.getValue();
+            ItemEntity itemDoacao = new ItemEntity(item, qtd);
+            criarDoacaoBO.doar(itemDoacao, user);
+            atualizar();
+        } catch (Exception e) {
+            Logger.logException("onClickDoacao", username, e);
+            lblError.setText("Erro ao registrar a doação.");
+            lblError.setVisible(true);
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void irParaUsuarios(ActionEvent event) {
+        UsuarioEntity user = UsuarioLogado.getUsuarioLogado();
+        if (user != null && user.isAdmin()) {
+            abrirNovaTela("usuarios.fxml", "Gerenciamento de Usuários");
+        } else {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Acesso Negado");
+            alert.setHeaderText(null);
+            alert.setContentText("Você não tem permissão para acessar esta área.");
+            alert.showAndWait();
+        }
     }
 
     @FXML
     void atualizar() {
-        List<Doacao> doacoesDoBanco = doacaoRepository.buscarTodos();
-        listaObservavel.setAll(doacoesDoBanco);
-        List<Item> totais = criarCestaBasicaService.obterListaDeEstoque();
+        UsuarioEntity user = UsuarioLogado.getUsuarioLogado();
+        String username = (user != null) ? user.getNome() : "desconhecido";
+        AuditLogger.logAction("atualizarDashboard", username);
+        try {
+            List<DoacaoEntity> doacoesDoBanco = doacaoDAO.buscarTodos();
+            listaObservavel.setAll(doacoesDoBanco);
+            List<ItemEntity> totais = criarCestaBasicaBO.obterListaDeEstoque();
 
-        listaObservavelItens.setAll(totais);
+            listaObservavelItens.setAll(totais);
 
-        int totalDeCestas = criarCestaBasicaService.criarCesta();
+            int totalDeCestas = criarCestaBasicaBO.criarCesta();
 
-        lblTotal.setText(String.valueOf(totalDeCestas));
-        lblTotal.setVisible(true);
+            lblTotal.setText(String.valueOf(totalDeCestas));
+            lblTotal.setVisible(true);
+        } catch (Exception e) {
+            Logger.logException("atualizarDashboard", username, e);
+            lblError.setText("Erro ao atualizar dados.");
+            lblError.setVisible(true);
+            e.printStackTrace();
+        }
     }
 
     @FXML
     public void voltar() {
+        UsuarioEntity user = UsuarioLogado.getUsuarioLogado();
+        String username = (user != null) ? user.getNome() : "desconhecido";
+        AuditLogger.logAction("logout", username);
         UsuarioLogado.setUsuarioLogado(null);
         abrirNovaTela("login.fxml", "Login");
     }
@@ -138,9 +190,49 @@ public class DashboardController implements Initializable {
             stage.show();
 
         } catch (IOException e) {
+            UsuarioEntity user = UsuarioLogado.getUsuarioLogado();
+            String username = (user != null) ? user.getNome() : "desconhecido";
+            Logger.logException("abrirNovaTela", username, e);
             lblError.setText("Erro ao carregar a tela: " + fxml);
             lblError.setVisible(true);
             e.printStackTrace();
         }
     }
+
+    @FXML
+    private void onRemover(ActionEvent event) {
+        if (doacaoSelecionada == null) {
+            exibirAlerta("Aviso", "Selecione uma doação para remover.");
+            return;
+        }
+
+        UsuarioEntity user = UsuarioLogado.getUsuarioLogado();
+        String username = (user != null) ? user.getNome() : "desconhecido";
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmar Remoção");
+        alert.setHeaderText("Deseja realmente remover o Doação de " + doacaoSelecionada.getItemDoacao().getNome() + "?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            AuditLogger.logAction("removerDoacao", username);
+            try {
+                doacaoDAO.remover(doacaoSelecionada.getId());
+                atualizar();
+                exibirAlerta("Sucesso", "doação removida com sucesso!");
+            } catch (Exception e) {
+                Logger.logException("removerUsuario", username, e);
+                exibirAlerta("Erro", "Erro ao remover doação: " + e.getMessage());
+            }
+        }
+    }
+    private void exibirAlerta(String titulo, String mensagem) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensagem);
+        alert.showAndWait();
+    }
 }
+
+

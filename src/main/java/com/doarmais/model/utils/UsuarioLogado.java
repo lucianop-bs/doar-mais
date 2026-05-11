@@ -1,16 +1,18 @@
 package com.doarmais.model.utils;
 
-import com.doarmais.model.domain.Usuario;
+import com.doarmais.model.entities.UsuarioEntity;
 
 public class UsuarioLogado {
 
-    public static Usuario usuarioLogado;
+    public static UsuarioEntity usuarioLogado;
 
-    public static Usuario getUsuarioLogado() {
+    public static UsuarioEntity getUsuarioLogado() {
         return usuarioLogado;
     }
 
-    public static void setUsuarioLogado(Usuario usuarioLogado) {
+    public static void setUsuarioLogado(UsuarioEntity usuarioLogado) {
         UsuarioLogado.usuarioLogado = usuarioLogado;
     }
 }
+
+
