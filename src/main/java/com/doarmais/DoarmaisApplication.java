@@ -1,8 +1,7 @@
 package com.doarmais;
 
+import com.doarmais.model.bo.NavigationBO;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class DoarmaisApplication extends Application {
@@ -12,16 +11,9 @@ public class DoarmaisApplication extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/login.fxml"));
-
-        Scene scene = new Scene(fxmlLoader.load());
-
-        primaryStage.setTitle("Login");
-        primaryStage.setScene(scene);
+    public void start(Stage primaryStage) {
+        NavigationBO.setPrimaryStage(primaryStage);
         primaryStage.setResizable(false);
-        primaryStage.show();
+        NavigationBO.navegar("login.fxml", "Login");
     }
 }
-
-

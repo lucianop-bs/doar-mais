@@ -1,26 +1,21 @@
 package com.doarmais.controller;
+
 import com.doarmais.model.entities.UsuarioEntity;
-import com.doarmais.model.dao.UsuarioDAO;
-import com.doarmais.model.bo.LoginBO;
-import com.doarmais.model.utils.UsuarioLogado;
-import com.doarmais.util.AuditLogger;
+import com.doarmais.model.infra.exception.NegocioException;
+import com.doarmais.model.bo.UsuarioBO;
+import com.doarmais.util.UsuarioLogado;
 import com.doarmais.util.Logger;
+import com.doarmais.model.bo.NavigationBO;
+import com.doarmais.util.BOFactory;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
-
-import java.io.IOException;
 
 public class LoginController {
 
-    private final UsuarioDAO usuarioDAO = new UsuarioDAO();
-    private final LoginBO loginBO = new LoginBO(usuarioDAO);
+    private final UsuarioBO usuarioBO = BOFactory.getUsuarioBO();
 
     @FXML
     private TextField txtUsuario;
@@ -31,50 +26,35 @@ public class LoginController {
 
     @FXML
     void onEntrarClick(ActionEvent event) {
-        String usuario = txtUsuario.getText();
+        limparErro();
+        String email = txtUsuario.getText();
         String senha = txtSenha.getText();
 
-        AuditLogger.logAction("onEntrarClick", usuario);
-
         try {
-            UsuarioEntity user = loginBO.autenticar(usuario, senha);
+            UsuarioEntity usuario = usuarioBO.autenticar(email, senha);
+            UsuarioLogado.setUsuarioLogado(usuario);
+            NavigationBO.navegar("dashboard.fxml", "Dashboard");
 
-            if (user != null) {
-                UsuarioLogado.setUsuarioLogado(user);
-                abrirNovaTela("dashboard.fxml", "Dashboard");
-            }
+        } catch (NegocioException e) {
+            exibirErro(e.getMessage());
         } catch (Exception e) {
-            Logger.logException("autenticar", usuario, e);
-            lblError.setText(e.getMessage());
-            lblError.setVisible(true);
+            Logger.logException("LoginController.onEntrarClick", email, e);
+            exibirErro("Erro ao realizar login.");
         }
-
     }
 
     @FXML
     void onCadastrarClick(ActionEvent event) {
-        AuditLogger.logAction("onCadastrarClick", "não autenticado");
-        abrirNovaTela("cadastro.fxml", "Cadastro");
+        NavigationBO.navegar("cadastro.fxml", "Cadastro");
     }
 
-    private void abrirNovaTela(String fxml, String nome) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/" + fxml));
-            Parent root = fxmlLoader.load();
-            Stage stage = (Stage) txtUsuario.getScene().getWindow();
-
-            stage.setScene(new Scene(root));
-            stage.setTitle(nome);
-            stage.show();
-
-        } catch (IOException e) {
-            Logger.logException("abrirNovaTela", txtUsuario.getText(), e);
-            lblError.setText("Erro ao carregar a tela: " + fxml);
-            lblError.setVisible(true);
-            e.printStackTrace();
-        }
+    private void exibirErro(String mensagem) {
+        lblError.setText(mensagem);
+        lblError.setVisible(true);
     }
 
+    private void limparErro() {
+        lblError.setVisible(false);
+        lblError.setText("");
+    }
 }
-
-

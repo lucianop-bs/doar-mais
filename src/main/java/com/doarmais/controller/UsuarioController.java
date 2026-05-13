@@ -1,30 +1,29 @@
 package com.doarmais.controller;
 
 import com.doarmais.model.entities.UsuarioEntity;
-import com.doarmais.model.dao.UsuarioDAO;
-import com.doarmais.model.utils.UsuarioLogado;
-import com.doarmais.util.AuditLogger;
+import com.doarmais.model.infra.exception.NegocioException;
+import com.doarmais.model.bo.UsuarioBO;
 import com.doarmais.util.Logger;
+import com.doarmais.model.bo.NavigationBO;
+import com.doarmais.util.BOFactory;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class UsuarioController implements Initializable {
+
+    private final UsuarioBO usuarioBO = BOFactory.getUsuarioBO();
+    private final ObservableList<UsuarioEntity> listaUsuarios = FXCollections.observableArrayList();
+    private UsuarioEntity usuarioSelecionado;
 
     @FXML
     private TableView<UsuarioEntity> tableUsuarios;
@@ -44,26 +43,22 @@ public class UsuarioController implements Initializable {
     @FXML
     private CheckBox chkAdmin;
 
-    private final UsuarioDAO usuarioDAO = new UsuarioDAO();
-    private final ObservableList<UsuarioEntity> listaUsuarios = FXCollections.observableArrayList();
-    private UsuarioEntity usuarioSelecionado;
-
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        configurarTabela();
+        atualizarTabela();
+    }
+
+    private void configurarTabela() {
         colId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colNome.setCellValueFactory(new PropertyValueFactory<>("nome"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
-        colAdmin.setCellValueFactory(celula -> new ReadOnlyStringWrapper(celula.getValue().isAdmin() ? "Sim" : "Não"));
+        colAdmin.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().isAdmin() ? "Sim" : "Não"));
 
         tableUsuarios.setItems(listaUsuarios);
-
         tableUsuarios.getSelectionModel().selectedItemProperty().addListener((obs, antigo, novo) -> {
-            if (novo != null) {
-                selecionarUsuario(novo);
-            }
+            if (novo != null) selecionarUsuario(novo);
         });
-
-        atualizarTabela();
     }
 
     private void selecionarUsuario(UsuarioEntity usuario) {
@@ -75,16 +70,11 @@ public class UsuarioController implements Initializable {
 
     @FXML
     private void atualizarTabela() {
-        UsuarioEntity user = UsuarioLogado.getUsuarioLogado();
-        String username = (user != null) ? user.getNome() : "desconhecido";
-        AuditLogger.logAction("listarUsuarios", username);
-        
         try {
-            List<UsuarioEntity> usuarios = usuarioDAO.buscarTodos();
-            listaUsuarios.setAll(usuarios);
+            listaUsuarios.setAll(usuarioBO.listarTodos());
         } catch (Exception e) {
-            Logger.logException("listarUsuarios", username, e);
-            exibirAlerta("Erro", "Erro ao carregar usuários: " + e.getMessage());
+            Logger.logException("UsuarioController.atualizarTabela", "erro", e);
+            exibirAlerta("Erro", "Erro ao carregar usuários.");
         }
     }
 
@@ -95,22 +85,21 @@ public class UsuarioController implements Initializable {
             return;
         }
 
-        UsuarioEntity user = UsuarioLogado.getUsuarioLogado();
-        String username = (user != null) ? user.getNome() : "desconhecido";
-        AuditLogger.logAction("editarUsuario", username);
-
-        usuarioSelecionado.setNome(txtNome.getText());
-        usuarioSelecionado.setEmail(txtEmail.getText());
-        usuarioSelecionado.setAdmin(chkAdmin.isSelected());
-
         try {
-            usuarioDAO.atualizar(usuarioSelecionado);
+            usuarioSelecionado.setNome(txtNome.getText());
+            usuarioSelecionado.setEmail(txtEmail.getText());
+            usuarioSelecionado.setAdmin(chkAdmin.isSelected());
+
+            // Nota: No UsuarioBO precisaremos de um método de atualizar se quisermos seguir o padrão.
+            // Por enquanto vamos usar o DAO via factory ou adicionar o método no BO.
+            BOFactory.getUsuarioDAO().atualizar(usuarioSelecionado); 
+            
             atualizarTabela();
             limparCampos();
             exibirAlerta("Sucesso", "Usuário atualizado com sucesso!");
         } catch (Exception e) {
-            Logger.logException("editarUsuario", username, e);
-            exibirAlerta("Erro", "Erro ao atualizar usuário: " + e.getMessage());
+            Logger.logException("UsuarioController.onSalvar", txtEmail.getText(), e);
+            exibirAlerta("Erro", "Erro ao atualizar usuário.");
         }
     }
 
@@ -121,31 +110,24 @@ public class UsuarioController implements Initializable {
             return;
         }
 
-        UsuarioEntity user = UsuarioLogado.getUsuarioLogado();
-        String username = (user != null) ? user.getNome() : "desconhecido";
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmar Remoção");
-        alert.setHeaderText("Deseja realmente remover o usuário " + usuarioSelecionado.getNome() + "?");
-        
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            AuditLogger.logAction("removerUsuario", username);
-            try {
-                usuarioDAO.remover(usuarioSelecionado.getId());
-                atualizarTabela();
-                limparCampos();
-                exibirAlerta("Sucesso", "Usuário removido com sucesso!");
-            } catch (Exception e) {
-                Logger.logException("removerUsuario", username, e);
-                exibirAlerta("Erro", "Erro ao remover usuário: " + e.getMessage());
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Deseja realmente remover o usuário " + usuarioSelecionado.getNome() + "?", ButtonType.YES, ButtonType.NO);
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.YES) {
+                try {
+                    usuarioBO.excluir(usuarioSelecionado.getId());
+                    atualizarTabela();
+                    limparCampos();
+                    exibirAlerta("Sucesso", "Usuário removido com sucesso!");
+                } catch (Exception e) {
+                    exibirAlerta("Erro", "Erro ao remover usuário.");
+                }
             }
-        }
+        });
     }
 
     @FXML
     private void onVoltar(ActionEvent event) {
-        abrirNovaTela("dashboard.fxml", "Dashboard");
+        NavigationBO.navegar("dashboard.fxml", "Dashboard");
     }
 
     private void limparCampos() {
@@ -163,24 +145,4 @@ public class UsuarioController implements Initializable {
         alert.setContentText(mensagem);
         alert.showAndWait();
     }
-
-    private void abrirNovaTela(String fxml, String nome) {
-        try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/view/" + fxml));
-            Parent root = fxmlLoader.load();
-            Stage stage = (Stage) tableUsuarios.getScene().getWindow();
-
-            stage.setScene(new Scene(root));
-            stage.setTitle(nome);
-            stage.show();
-
-        } catch (IOException e) {
-            UsuarioEntity user = UsuarioLogado.getUsuarioLogado();
-            String username = (user != null) ? user.getNome() : "desconhecido";
-            Logger.logException("abrirNovaTela", username, e);
-            e.printStackTrace();
-        }
-    }
 }
-
-
