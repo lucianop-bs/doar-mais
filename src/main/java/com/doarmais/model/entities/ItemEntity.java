@@ -1,10 +1,10 @@
 package com.doarmais.model.entities;
 
 public class ItemEntity {
-    private ItemDoacaoEntity nome;
+    private TipoItemEntity nome;
     private Integer qtd;
 
-    public ItemEntity(ItemDoacaoEntity nome, Integer qtd) {
+    public ItemEntity(TipoItemEntity nome, Integer qtd) {
         this.nome = nome;
         this.qtd = qtd;
     }
@@ -17,13 +17,11 @@ public class ItemEntity {
         this.qtd = qtd;
     }
 
-    public ItemDoacaoEntity getNome() {
+    public TipoItemEntity getNome() {
         return nome;
     }
 
-    public void setNome(ItemDoacaoEntity nome) {
+    public void setNome(TipoItemEntity nome) {
         this.nome = nome;
     }
 }
-
-

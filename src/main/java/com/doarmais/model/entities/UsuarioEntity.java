@@ -9,6 +9,8 @@ public class UsuarioEntity {
     private String senha;
     private LocalDate criadoEm;
     private boolean isAdmin;
+    private boolean isBeneficiario;
+
 
     public UsuarioEntity() {
     }
