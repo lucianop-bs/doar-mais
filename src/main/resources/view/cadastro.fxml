@@ -6,53 +6,42 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.doarmais.controller.CadastroController">
+<AnchorPane prefHeight="500.0" prefWidth="450.0" stylesheets="@../css/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.doarmais.controller.CadastroController">
    <children>
-      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox alignment="CENTER" layoutX="50.0" layoutY="25.0" prefHeight="450.0" prefWidth="350.0" spacing="15.0" styleClass="pane-card">
          <children>
-            <Label style="-fx-border-color: black;" text="CADASTRO">
-               <font>
-                  <Font name="System Bold" size="17.0" />
-               </font>
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding>
-            </Label>
-            <Label fx:id="lblError" alignment="CENTER" contentDisplay="CENTER" disable="true" prefHeight="18.0" prefWidth="306.0" textFill="#ff0808" />
-            <VBox maxWidth="400.0" spacing="5.0">
+            <Label styleClass="label-title" text="CADASTRO" />
+            <Label fx:id="lblError" alignment="CENTER" prefHeight="18.0" prefWidth="300.0" textFill="RED" />
+            <VBox spacing="5.0">
                <children>
-                  <Label text="Nome:" />
-                  <TextField fx:id="txtNome" maxWidth="400.0" promptText="Digite seu nome " />
+                  <Label text="Nome Completo:" />
+                  <TextField fx:id="txtNome" prefHeight="35.0" promptText="Digite seu nome" />
                </children>
             </VBox>
-            <VBox maxWidth="400.0" spacing="5.0">
+            <VBox spacing="5.0">
                <children>
                   <Label text="E-mail:" />
-                  <TextField fx:id="txtEmail" maxWidth="400.0" promptText="Digite seu e-mail" />
+                  <TextField fx:id="txtEmail" prefHeight="35.0" promptText="Digite seu e-mail" />
                </children>
             </VBox>
-            <VBox maxWidth="400.0" spacing="5.0">
+            <VBox spacing="5.0">
                <children>
                   <Label text="Senha:" />
-                  <PasswordField fx:id="txtSenha" promptText="Digite sua senha" />
+                  <PasswordField fx:id="txtSenha" prefHeight="35.0" promptText="Crie uma senha forte" />
                </children>
             </VBox>
-            <HBox alignment="CENTER" spacing="10.0">
+            <VBox spacing="10.0">
                <children>
-                  <Button mnemonicParsing="false" onAction="#onCadastrarClick" text="Cadastrar" />
-                  <Button mnemonicParsing="false" onAction="#voltar" text="Voltar" />
+                  <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#onCadastrarClick" prefHeight="40.0" styleClass="btn-success" text="CONFIRMAR CADASTRO" />
+                  <Button maxWidth="Infinity" mnemonicParsing="false" onAction="#voltar" prefHeight="40.0" styleClass="btn-danger" text="VOLTAR" />
                </children>
                <VBox.margin>
-                  <Insets top="30.0" />
+                  <Insets top="10.0" />
                </VBox.margin>
-            </HBox>
+            </VBox>
          </children>
       </VBox>
    </children>
