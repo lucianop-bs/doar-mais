@@ -17,7 +17,7 @@ public class Logger {
             String timestamp = LocalDateTime.now().format(formatter);
             String logMessage = String.format("Data/Hora: %s, Usuário: %s, Ação: %s, Exceção: %s%n",
                     timestamp, UsuarioEntity, acao, e.toString());
-            Files.write(Paths.get(FILE_NAME), logMessage.getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            Files.write(Paths.get(FILE_NAME), logMessage.getBytes(java.nio.charset.StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
         } catch (IOException ex) {
             System.err.println("Falha ao escrever no arquivo de log: " + ex.getMessage());
         }

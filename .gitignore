@@ -31,3 +31,5 @@ build/
 
 ### VS Code ###
 .vscode/
+log_de_auditoria.txt
+log_de_erros.txt
