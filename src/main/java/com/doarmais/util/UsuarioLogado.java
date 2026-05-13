@@ -1,4 +1,4 @@
-package com.doarmais.model.utils;
+package com.doarmais.util;
 
 import com.doarmais.model.entities.UsuarioEntity;
 
