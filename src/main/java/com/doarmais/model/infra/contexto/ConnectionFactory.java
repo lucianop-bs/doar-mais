@@ -8,8 +8,8 @@ import java.sql.SQLException;
 public class ConnectionFactory {
 
     private static final String URL = "jdbc:postgresql://localhost:5432/doarmais_db";
-    private static final String USER = "postgres";
-    private static final String PASSWORD = "admin";
+    private static final String USER = "seu_usuario";
+    private static final String PASSWORD = "sua_senha";
 
     public static Connection getConnection() {
         try {

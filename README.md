@@ -99,8 +99,8 @@ CREATE TABLE distribuicoes (
 Verifique ou edite o arquivo `src/main/java/com/doarmais/model/infra/contexto/ConnectionFactory.java` com suas credenciais:
 ```java
 private static final String URL = "jdbc:postgresql://localhost:5432/doarmais_db";
-private static final String USER = "postgres";
-private static final String PASSWORD = "admin";
+private static final String USER = "seu_usuario";
+private static final String PASSWORD = "sua_senha";
 ```
 
 ### Passo 3: Compilar e Executar
