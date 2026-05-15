@@ -1,120 +1,99 @@
-# Doar+ - Sistema de Gerenciamento de Doações e Cestas Básicas
+# Doar+ Desktop 🤝 📦
 
-Este projeto consiste em um software desktop completo desenvolvido para a disciplina de **Programação III** do Instituto Federal de Goiás (IFG) - Campus Luziânia. O sistema visa facilitar o gerenciamento de doações de itens alimentícios, controle de estoque dinâmico e a distribuição de cestas básicas para beneficiários.
+![Java](https://img.shields.io/badge/Java-21-orange?style=for-the-badge&logo=openjdk)
+![JavaFX](https://img.shields.io/badge/JavaFX-21-blue?style=for-the-badge&logo=java)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=for-the-badge&logo=postgresql)
+![Maven](https://img.shields.io/badge/Maven-3.9-C71A36?style=for-the-badge&logo=apache-maven)
 
-## 🛠 Tecnologias Utilizadas
+O **Doar+ Desktop** é uma solução robusta para o gerenciamento de doações de alimentos e montagem de cestas básicas. Desenvolvido para a disciplina de **Programação III** no IFG Luziânia, o sistema foca em performance, rastreabilidade e facilidade de uso em ambientes de balcão/estoque.
 
-*   **Linguagem:** Java 21 (LTS)
-*   **Interface Gráfica:** JavaFX 21
-*   **Banco de Dados:** PostgreSQL
-*   **Arquitetura:** MVC (Model-View-Controller) com Padrão BO (Business Object)
-*   **Gerenciador de Dependências:** Maven
+---
 
-## 📋 Requisitos Atendidos
+## 📸 Demonstração
+*(Espaço para GIF ou Screenshots do Sistema)*
+> **Dica:** Adicione imagens da tela de Login, Dashboard e o Carrinho de Entrada aqui.
 
-1.  **Autenticação de Usuário:** Login por e-mail e senha com controle de privilégios.
-2.  **Gestão de Usuários (CRUD):** Administradores podem gerenciar contas de usuários.
-3.  **Catálogo Dinâmico de Itens:** Gerenciamento de tipos de doações via banco de dados (sem enums fixos).
-4.  **Entrada em Lote (Carrinho):** Interface agilizada para receber múltiplas doações de uma só vez.
-5.  **Controle de Estoque:** Atualização automática e cálculo real da capacidade de cestas básicas.
-6.  **Registro de Beneficiários:** Histórico de para quem as cestas foram distribuídas.
-7.  **Rastreabilidade e Auditoria:** Registro de ações em `log_de_auditoria.txt`.
-8.  **Tratamento de Exceções:** Logs técnicos detalhados em `log_de_erros.txt`.
+---
 
-## 🚀 Funcionalidades Principais
+## ✨ Funcionalidades Principais
 
-### 1. Recebimento Inteligente
-O sistema utiliza um modelo de "Carrinho de Entrada", onde o usuário adiciona itens a uma lista temporária, podendo inclusive usar o atalho de **Cesta Completa** para preencher todos os itens essenciais com um clique, finalizando o processo de uma única vez.
+- **🔐 Autenticação Segura:** Sistema de login com criptografia simples e níveis de acesso (Admin/Operador).
+- **🛒 Carrinho de Entrada:** Agilidade no recebimento de múltiplas doações em uma única transação.
+- **📦 Gestão de Estoque Dinâmica:** Controle em tempo real com cálculo automático de quantas cestas podem ser montadas.
+- **👥 Cadastro de Beneficiários:** Registro completo de entregas para garantir que a ajuda chegue a quem precisa.
+- **📜 Auditoria Completa:** Logs detalhados de todas as ações críticas em `log_de_auditoria.txt`.
+- **🚨 Error Handling:** Sistema de logs técnicos para fácil manutenção em `log_de_erros.txt`.
 
-### 2. Distribuição e Rastreio
-Ao entregar cestas, o sistema exige o nome do beneficiário, decrementa o estoque de forma proporcional e registra a transação vinculada ao operador atual.
+---
+
+## 🏗️ Arquitetura e Padrões
+
+O projeto segue rigorosamente os padrões da engenharia de software:
+- **MVC (Model-View-Controller):** Separação clara entre interface, lógica e dados.
+- **DAO (Data Access Object):** Abstração completa da camada de persistência.
+- **BO (Business Object):** Centralização das regras de negócio.
+- **Singleton:** Garantia de conexão única com o banco de dados.
+
+---
+
+## 📂 Estrutura do Projeto
+
+```text
+doarmais/
+├── src/main/java/com/doarmais/
+│   ├── controller/      # Controladores JavaFX (Eventos e Telas)
+│   ├── model/
+│   │   ├── dao/         # Comunicação com Banco de Dados
+│   │   ├── bo/          # Regras de Negócio e Validações
+│   │   ├── entity/      # Classes de Modelo (POJOs)
+│   │   └── infra/       # Configurações de Conexão e Logs
+│   └── view/            # Arquivos FXML e Estilização CSS
+├── src/main/resources/  # Assets, Imagens e Configurações
+├── lib/                 # Dependências externas (Driver JDBC)
+└── pom.xml              # Configuração Maven
+```
+
+---
 
 ## ⚙️ Como Rodar Localmente
 
-### Pré-requisitos
-*   Java 21 instalado.
-*   PostgreSQL instalado e rodando.
-*   Maven configurado.
+### 1. Pré-requisitos
+*   **JDK 21** ou superior.
+*   **PostgreSQL** rodando localmente.
+*   **Maven** instalado e configurado no PATH.
 
-### Passo 1: Configurar o Banco de Dados
-Crie um banco de dados chamado `doarmais_db` no PostgreSQL e execute o script abaixo:
+### 2. Preparação do Banco de Dados
+Crie um banco chamado `doarmais_db` e execute o script de inicialização:
 
 ```sql
--- Tabela de Usuários
-CREATE TABLE usuarios (
-    id SERIAL PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    senha VARCHAR(100) NOT NULL,
-    isAdmin BOOLEAN DEFAULT FALSE,
-    criadoEm DATE DEFAULT CURRENT_DATE
-);
+-- Script simplificado para setup rápido
+CREATE TABLE usuarios (id SERIAL PRIMARY KEY, nome VARCHAR(100), email VARCHAR(100) UNIQUE, senha VARCHAR(100), isAdmin BOOLEAN);
+INSERT INTO usuarios (nome, email, senha, isAdmin) VALUES ('Administrador', 'admin', 'admin', TRUE);
 
--- Usuário Administrador Padrão
-INSERT INTO usuarios (nome, email, senha, isAdmin) 
-VALUES ('Administrador', 'admin', 'admin', TRUE)
-ON CONFLICT (email) DO NOTHING;
+CREATE TABLE tipos_item (id SERIAL PRIMARY KEY, nome VARCHAR(50) UNIQUE, descricao VARCHAR(100));
+INSERT INTO tipos_item (nome, descricao) VALUES ('ARROZ', 'Arroz'), ('FEIJAO', 'Feijão'), ('OLEO', 'Óleo');
 
--- Tabela de Catálogo de Itens (Substituiu o Enum)
-CREATE TABLE tipos_item (
-    id SERIAL PRIMARY KEY,
-    nome VARCHAR(50) UNIQUE NOT NULL,
-    descricao VARCHAR(100) NOT NULL
-);
-
--- Carga inicial do catálogo
-INSERT INTO tipos_item (nome, descricao) VALUES 
-('ARROZ', 'Arroz'), ('FEIJAO', 'Feijão'), ('MACARRAO', 'Macarrão'), 
-('CUSCUZ', 'Flocão de Milho / Cuscuz'), ('OLEO', 'Óleo de Soja'), 
-('CAFE', 'Café'), ('ACUCAR', 'Açúcar'), ('SAL', 'Sal'), 
-('LEITE', 'Leite'), ('BISCOITO', 'Biscoito')
-ON CONFLICT (nome) DO NOTHING;
-
--- Histórico de Doações Recebidas
-CREATE TABLE doacoes (
-    id SERIAL PRIMARY KEY,
-    nome_item VARCHAR(50) NOT NULL REFERENCES tipos_item(nome),
-    quantidade INTEGER NOT NULL,
-    usuario_id INTEGER REFERENCES usuarios(id),
-    data_doacao DATE DEFAULT CURRENT_DATE
-);
-
--- Controle de Estoque Atual
-CREATE TABLE estoque (
-    nome_item VARCHAR(50) PRIMARY KEY REFERENCES tipos_item(nome),
-    quantidade INTEGER NOT NULL DEFAULT 0
-);
-
--- Registro de Entregas (Beneficiários)
-CREATE TABLE distribuicoes (
-    id SERIAL PRIMARY KEY,
-    beneficiario VARCHAR(100) NOT NULL,
-    quantidade_cestas INTEGER NOT NULL,
-    usuario_id INTEGER REFERENCES usuarios(id),
-    data_distribuicao DATE DEFAULT CURRENT_DATE
-);
+CREATE TABLE estoque (nome_item VARCHAR(50) PRIMARY KEY REFERENCES tipos_item(nome), quantidade INTEGER DEFAULT 0);
+CREATE TABLE doacoes (id SERIAL PRIMARY KEY, nome_item VARCHAR(50) REFERENCES tipos_item(nome), quantidade INTEGER, usuario_id INTEGER, data_doacao DATE DEFAULT CURRENT_DATE);
+CREATE TABLE distribuicoes (id SERIAL PRIMARY KEY, beneficiario VARCHAR(100), quantidade_cestas INTEGER, usuario_id INTEGER, data_distribuicao DATE DEFAULT CURRENT_DATE);
 ```
 
-### Passo 2: Configurar Conexão
-Verifique ou edite o arquivo `src/main/java/com/doarmais/model/infra/contexto/ConnectionFactory.java` com suas credenciais:
-```java
-private static final String URL = "jdbc:postgresql://localhost:5432/doarmais_db";
-private static final String USER = "seu_usuario";
-private static final String PASSWORD = "sua_senha";
-```
+### 3. Configuração de Acesso
+Ajuste as credenciais em: `src/main/java/com/doarmais/model/infra/contexto/ConnectionFactory.java`
 
-### Passo 3: Compilar e Executar
-No terminal, dentro da pasta do projeto, execute:
+### 4. Execução
 ```bash
 mvn clean compile
 mvn javafx:run
 ```
 
-## 📄 Logs
-*   **Auditoria:** `log_de_auditoria.txt` registra quem realizou cada doação ou distribuição.
-*   **Erros:** `log_de_erros.txt` captura o stacktrace de qualquer falha inesperada.
+---
+
+## 👨‍💻 Autor
+**Luciano Oliveira Borges Souza**
+*   Professor: Dr. Daniel Lucena
+*   Instituição: IFG - Campus Luziânia
 
 ---
-**Desenvolvido por:** Luciano Oliveira Borges Souza
-**Professor:** Dr. Daniel Lucena
-**Instituição:** IFG - Campus Luziânia
+## 📄 Licença
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para detalhes.
