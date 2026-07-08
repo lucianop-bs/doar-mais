@@ -46,9 +46,10 @@
                         </Label>
                     </children>
                 </VBox>
-            <VBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0">
+            <VBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" spacing="8.0">
                <children>
                   <Button fx:id="btnGerenciarUsuarios" alignment="CENTER" mnemonicParsing="false" onAction="#irParaUsuarios" prefHeight="40.0" prefWidth="180.0" styleClass="btn-primary" text="Gerenciar Usuários" />
+                  <Button fx:id="btnVerLogs" alignment="CENTER" mnemonicParsing="false" onAction="#irParaLogs" prefHeight="40.0" prefWidth="180.0" styleClass="btn-warning" text="Ver Logs" />
                </children>
             </VBox>
             <HBox alignment="CENTER_RIGHT" fillHeight="false" prefHeight="118.0" prefWidth="600.0">
@@ -148,7 +149,7 @@
                                   <TableColumn fx:id="colData" prefWidth="80.0" text="Data" />
                               </columns>
                           </TableView>
-                        <Button alignment="CENTER" mnemonicParsing="false" onAction="#onRemover" prefWidth="320.0" styleClass="btn-danger" text="Remover Selecionada">
+                        <Button fx:id="btnRemoverDoacao" alignment="CENTER" mnemonicParsing="false" onAction="#onRemover" prefWidth="320.0" styleClass="btn-danger" text="Remover Selecionada">
                            <font>
                               <Font name="System Bold" size="10.0" />
                            </font>

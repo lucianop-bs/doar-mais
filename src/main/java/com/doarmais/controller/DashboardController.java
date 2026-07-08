@@ -53,6 +53,10 @@ public class DashboardController implements Initializable {
     @FXML
     private Button btnGerenciarUsuarios;
     @FXML
+    private Button btnVerLogs;
+    @FXML
+    private Button btnRemoverDoacao;
+    @FXML
     private javafx.scene.layout.HBox paneDistribuir;
 
     @FXML
@@ -118,26 +122,22 @@ public class DashboardController implements Initializable {
 
     private void configurarTabelas() {
         var test =  new UsuarioEntity();
-        // Tabela de Doações
         colItem.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().getItemDoacao().getNome().getDescricao()));
         colUsuario.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().getUsuario().getNome()));
         colQtd.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().getItemDoacao().getQtd().toString()));
         colData.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().getCriadoEm().format(formatter)));
         tableDoacoes.setItems(listaDoacoes);
 
-        // Tabela de Estoque
         colItemNome.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().getTipoItem().getDescricao()));
         colQtdTotal.setCellValueFactory(new PropertyValueFactory<>("quantidade"));
         tableItem.setItems(listaEstoque);
 
-        // Tabela de Distribuições (Beneficiários)
         colBenNome.setCellValueFactory(new PropertyValueFactory<>("beneficiario"));
         colBenQtd.setCellValueFactory(new PropertyValueFactory<>("quantidadeCestas"));
         colBenData.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().getDataDistribuicao().format(formatter)));
         colBenUser.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().getUsuario().getNome()));
         tableDistribuicoes.setItems(listaDistribuicoes);
 
-        // Tabela de Itens Pendentes (Carrinho)
         colPenItem.setCellValueFactory(c -> new ReadOnlyStringWrapper(c.getValue().getNome().getDescricao()));
         colPenQtd.setCellValueFactory(new PropertyValueFactory<>("qtd"));
         tablePendentes.setItems(listaPendentes);
@@ -157,6 +157,10 @@ public class DashboardController implements Initializable {
         }
         
         btnGerenciarUsuarios.setVisible(isAdmin);
+        btnVerLogs.setVisible(isAdmin);
+        btnVerLogs.setManaged(isAdmin);
+        btnRemoverDoacao.setVisible(isAdmin);
+        btnRemoverDoacao.setManaged(isAdmin);
         paneDistribuir.setVisible(isAdmin);
         paneDistribuir.setManaged(isAdmin);
     }
@@ -225,6 +229,7 @@ public class DashboardController implements Initializable {
             listaPendentes.clear();
             atualizar();
         } catch (NegocioException e) {
+            Logger.logException("Dashboard.onFinalizarRecebimento", "erro", e);
             exibirErro(e.getMessage());
         } catch (Exception e) {
             Logger.logException("Dashboard.onFinalizarRecebimento", "erro", e);
@@ -240,6 +245,7 @@ public class DashboardController implements Initializable {
             txtBeneficiario.clear();
             atualizar();
         } catch (NegocioException e) {
+            Logger.logException("Dashboard.onDoar", "erro", e);
             exibirErro(e.getMessage());
         } catch (Exception e) {
             Logger.logException("Dashboard.onDoar", "erro", e);
@@ -282,6 +288,11 @@ public class DashboardController implements Initializable {
     @FXML
     void irParaUsuarios(ActionEvent event) {
         NavigationBO.navegar("usuarios.fxml", "Gerenciamento de Usuários");
+    }
+
+    @FXML
+    void irParaLogs(ActionEvent event) {
+        NavigationBO.navegar("logs.fxml", "Logs do Sistema");
     }
 
     @FXML

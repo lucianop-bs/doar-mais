@@ -3,7 +3,9 @@ package com.doarmais.controller;
 import com.doarmais.model.entities.UsuarioEntity;
 import com.doarmais.model.infra.exception.NegocioException;
 import com.doarmais.model.bo.UsuarioBO;
+import com.doarmais.util.AuditLogger;
 import com.doarmais.util.Logger;
+import com.doarmais.util.UsuarioLogado;
 import com.doarmais.model.bo.NavigationBO;
 import com.doarmais.util.BOFactory;
 import javafx.beans.property.ReadOnlyStringWrapper;
@@ -90,10 +92,10 @@ public class UsuarioController implements Initializable {
             usuarioSelecionado.setEmail(txtEmail.getText());
             usuarioSelecionado.setAdmin(chkAdmin.isSelected());
 
-            // Nota: No UsuarioBO precisaremos de um método de atualizar se quisermos seguir o padrão.
-            // Por enquanto vamos usar o DAO via factory ou adicionar o método no BO.
-            BOFactory.getUsuarioDAO().atualizar(usuarioSelecionado); 
-            
+            BOFactory.getUsuarioDAO().atualizar(usuarioSelecionado);
+            AuditLogger.logAction("Atualizar usuário id=" + usuarioSelecionado.getId(),
+                    UsuarioLogado.getUsuarioLogado() != null ? UsuarioLogado.getUsuarioLogado().getEmail() : "?");
+
             atualizarTabela();
             limparCampos();
             exibirAlerta("Sucesso", "Usuário atualizado com sucesso!");

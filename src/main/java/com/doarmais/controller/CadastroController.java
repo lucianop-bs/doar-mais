@@ -40,6 +40,7 @@ public class CadastroController {
             NavigationBO.navegar("login.fxml", "Login");
 
         } catch (NegocioException e) {
+            Logger.logException("CadastroController.onCadastrarClick", txtEmail.getText(), e);
             exibirErro(e.getMessage());
         } catch (Exception e) {
             Logger.logException("CadastroController.onCadastrarClick", txtEmail.getText(), e);

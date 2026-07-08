@@ -29,8 +29,10 @@ public class UsuarioBO {
     }
 
     public UsuarioEntity autenticar(String email, String senha) {
-        return usuarioDAO.login(email, senha)
+        UsuarioEntity usuario = usuarioDAO.login(email, senha)
                 .orElseThrow(() -> new NegocioException("E-mail ou senha inválidos."));
+        AuditLogger.logAction("Login", email);
+        return usuario;
     }
 
     public List<UsuarioEntity> listarTodos() {
@@ -39,6 +41,7 @@ public class UsuarioBO {
 
     public void excluir(Long id) {
         usuarioDAO.remover(id);
+        AuditLogger.logAction("Excluir usuário id=" + id, "admin");
     }
 
     private void validarUsuario(UsuarioEntity usuario) {

@@ -37,19 +37,18 @@ public class EstoqueDAO {
         return lista;
     }
 
-    public void atualizarQuantidade(String nomeItem, int delta) {
+    public void atualizarQuantidade(String nomeItem, int quantidade) {
         String sql = "UPDATE estoque SET quantidade = quantidade + ? WHERE nome_item = ?";
 
         try (Connection conn = ConnectionFactory.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, delta);
+            stmt.setInt(1, quantidade);
             stmt.setString(2, nomeItem);
             
             int rows = stmt.executeUpdate();
-            if (rows == 0 && delta > 0) {
-                // Se o item não existir e for entrada, tenta inserir
-                inserirNovoItem(nomeItem, delta);
+            if (rows == 0 && quantidade > 0) {
+                inserirNovoItem(nomeItem, quantidade);
             }
         } catch (SQLException e) {
             throw new PersistenciaException("Erro ao atualizar estoque", e);

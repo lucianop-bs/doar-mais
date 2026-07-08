@@ -36,6 +36,7 @@ public class LoginController {
             NavigationBO.navegar("dashboard.fxml", "Dashboard");
 
         } catch (NegocioException e) {
+            Logger.logException("LoginController.onEntrarClick", email, e);
             exibirErro(e.getMessage());
         } catch (Exception e) {
             Logger.logException("LoginController.onEntrarClick", email, e);

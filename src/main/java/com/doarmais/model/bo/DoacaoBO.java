@@ -5,6 +5,7 @@ import com.doarmais.model.dao.DoacaoDAO;
 import com.doarmais.model.dao.EstoqueDAO;
 import com.doarmais.model.entities.*;
 import com.doarmais.model.infra.exception.NegocioException;
+import com.doarmais.util.AuditLogger;
 
 import java.util.List;
 
@@ -37,6 +38,7 @@ public class DoacaoBO {
 
         doacaoDAO.salvar(doacao);
         estoqueDAO.atualizarQuantidade(item.getNome().getNome(), item.getQtd());
+        AuditLogger.logAction("Doação registrada: " + item.getQtd() + "x " + item.getNome().getNome(), usuario.getEmail());
     }
 
     public List<DoacaoEntity> listarTodas() {
@@ -60,7 +62,7 @@ public class DoacaoBO {
         DoacaoEntity doacao = doacaoDAO.buscarPorId(id)
                 .orElseThrow(() -> new NegocioException("Doação não encontrada."));
 
-        // Validação: Não permitir remover se o item já foi usado em uma cesta (estoque ficaria negativo)
+
         List<EstoqueEntity> estoqueAtual = obterEstoqueAtual();
         int qtdEstoque = estoqueAtual.stream()
                 .filter(e -> e.getTipoItem().getNome().equals(doacao.getItemDoacao().getNome().getNome()))
@@ -74,6 +76,7 @@ public class DoacaoBO {
 
         estoqueDAO.atualizarQuantidade(doacao.getItemDoacao().getNome().getNome(), -doacao.getItemDoacao().getQtd());
         doacaoDAO.remover(id);
+        AuditLogger.logAction("Remover doação id=" + id, "admin");
     }
 
     public List<EstoqueEntity> obterEstoqueAtual() {
@@ -110,5 +113,6 @@ public class DoacaoBO {
         }
         
         distribuicaoDAO.salvar(new DistribuicaoEntity(beneficiario, quantidade, usuario));
+        AuditLogger.logAction("Distribuir " + quantidade + " cesta(s) para " + beneficiario, usuario.getEmail());
     }
 }

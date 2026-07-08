@@ -12,6 +12,18 @@ public class AuditLogger {
     private static final String FILE_NAME = "log_de_auditoria.txt";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    public static String getFileName() {
+        return FILE_NAME;
+    }
+
+    public static void reset() {
+        try {
+            Files.write(Paths.get(FILE_NAME), new byte[0], StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException ex) {
+            System.err.println("Falha ao limpar o arquivo de log de auditoria: " + ex.getMessage());
+        }
+    }
+
     public static void logAction(String acao, String UsuarioEntity) {
         try {
             String timestamp = LocalDateTime.now().format(formatter);
